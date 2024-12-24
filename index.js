@@ -38,12 +38,17 @@ async function run() {
         const database = client.db('ServiceDB');
         const serviceCollection = database.collection('services');
 
+        // service related api
         app.post('/addservice', async(req,res)=>{
             const data = req.body;
             const result = await serviceCollection.insertOne(data);
             res.send(result);
         })
 
+        app.get('/feature', async(req,res)=>{
+            const feature =await serviceCollection.find().sort( {price: -1}).limit(6).toArray();
+            res.send(feature);
+        })
 
     } finally {
         // Ensures that the client will close when you finish/error
@@ -51,9 +56,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
 
 app.get('/', (req, res) => {
     res.send('Server is Okkkkkay');
