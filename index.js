@@ -71,6 +71,26 @@ async function run() {
             res.send(result)
         })
 
+        app.put('/myservice/update', async(req,res)=>{
+            const id = req.query.id;
+            const update = req.body;
+            const updatedService = {
+                $set: {
+                    title : update.title,
+                    image : update.image,
+                    website : update.website,
+                    companyName : update.companyName,
+                    price : update.price,
+                    description : update.description,
+                    category : update.category
+                }
+            }
+            const filter = { _id : new ObjectId(id)}
+            const options = { upsert : true}
+            const result = await serviceCollection.updateOne(filter, updatedService,options)
+            res.send(result);
+        })
+
         // review
         app.post('/service-review', async (req, res) => {
             const review = req.body;
