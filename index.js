@@ -26,11 +26,8 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
+        // https://assignment-eleven-server-amber.vercel.app/
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         const database = client.db('ServiceDB');
         const serviceCollection = database.collection('services');
@@ -57,6 +54,13 @@ async function run() {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
             const result = await serviceCollection.findOne(filter);
+            res.send(result);
+        })
+
+        app.get('/myservice', async (req, res) => {
+            const email = req.query.email;
+            const filter = { email: email };
+            const result = await serviceCollection.find(filter).toArray();
             res.send(result);
         })
 
