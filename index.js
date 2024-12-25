@@ -64,6 +64,13 @@ async function run() {
             res.send(result);
         })
 
+        app.delete('/myservice/delete', async(req,res)=>{
+            const id = req.query.id;
+            const filter = { _id : new ObjectId(id)}
+            const result = await serviceCollection.deleteOne(filter);
+            res.send(result)
+        })
+
         // review
         app.post('/service-review', async (req, res) => {
             const review = req.body;
