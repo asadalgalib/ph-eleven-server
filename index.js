@@ -8,7 +8,10 @@ const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware 
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -24,6 +27,23 @@ const client = new MongoClient(uri, {
     }
 });
 
+const verifyToken = (req, res, next) => {
+    const token = req.cookies.token;
+    console.log(token);
+
+    if (!token) {
+        return res.status(401).send({ message: 'Unauthorized user' });
+    }
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: 'Unauthorized user' });
+        }
+        req.user = decoded;
+        next();
+    })
+
+}
+
 async function run() {
     try {
         // https://assignment-eleven-server-amber.vercel.app/
@@ -32,6 +52,24 @@ async function run() {
         const database = client.db('ServiceDB');
         const serviceCollection = database.collection('services');
         const reviewCollection = database.collection('reviews');
+
+        // jwt related api
+        app.post('/jwt/login', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '24h' });
+
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: false
+            }).send({ success: true })
+        })
+
+        app.post('/jwt/logout', (req, res) => {
+            res.clearCookie('token', {
+                httpOnly: true,
+                secure: false
+            }).send({ message: 'cookie cleared' })
+        })
 
         // service related api
         app.post('/addservice', async (req, res) => {
@@ -57,37 +95,42 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/myservice', async (req, res) => {
+        app.get('/myservice', verifyToken, async (req, res) => {
             const email = req.query.email;
             const filter = { email: email };
             const result = await serviceCollection.find(filter).toArray();
+
+            if (req.user.email !== req.query.email) {
+                return res.status(403).send({ message: 'Forbiden access' });
+            }
+
             res.send(result);
         })
 
-        app.delete('/myservice/delete', async(req,res)=>{
+        app.delete('/myservice/delete', async (req, res) => {
             const id = req.query.id;
-            const filter = { _id : new ObjectId(id)}
+            const filter = { _id: new ObjectId(id) }
             const result = await serviceCollection.deleteOne(filter);
             res.send(result)
         })
 
-        app.put('/myservice/update', async(req,res)=>{
+        app.put('/myservice/update', async (req, res) => {
             const id = req.query.id;
             const update = req.body;
             const updatedService = {
                 $set: {
-                    title : update.title,
-                    image : update.image,
-                    website : update.website,
-                    companyName : update.companyName,
-                    price : update.price,
-                    description : update.description,
-                    category : update.category
+                    title: update.title,
+                    image: update.image,
+                    website: update.website,
+                    companyName: update.companyName,
+                    price: update.price,
+                    description: update.description,
+                    category: update.category
                 }
             }
-            const filter = { _id : new ObjectId(id)}
-            const options = { upsert : true}
-            const result = await serviceCollection.updateOne(filter, updatedService,options)
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const result = await serviceCollection.updateOne(filter, updatedService, options)
             res.send(result);
         })
 
@@ -124,41 +167,47 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/myreview', async (req,res)=>{
+        app.get('/myreview', verifyToken, async (req, res) => {
             const email = req.query.email;
-            const filter = { email : email};
+            const filter = { email: email };
             const result = await reviewCollection.find(filter).toArray();
+
+            if (req.user.email !== req.query.email) {
+                return res.status(403).send({ message: 'Forbiden access' });
+            }
+
             res.send(result)
         })
 
-        app.get('/review', async(req,res)=>{
+        app.get('/review', async (req, res) => {
             const id = req.query.id;
-            const filter = { _id : new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const result = await reviewCollection.findOne(filter)
             res.send(result);
         })
 
-        app.delete('/myreview/delete', async(req,res)=>{
+        app.delete('/myreview/delete', async (req, res) => {
             const id = req.query.id;
-            const filter = { _id : new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const result = await reviewCollection.deleteOne(filter);
             res.send(result);
         })
 
-        app.put('/myreview/update',async(req,res)=>{
+        app.put('/myreview/update', async (req, res) => {
             const id = req.query.id;
             const update = req.body;
             const updateReview = {
-                $set:{
-                    rating : update.rating,
-                    review : update.review
+                $set: {
+                    rating: update.rating,
+                    review: update.review
                 }
-            } 
-            const filter = { _id : new ObjectId(id)}
-            const options = {upsert:true}
-            const result = await reviewCollection.updateOne(filter,updateReview,options);
+            }
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true }
+            const result = await reviewCollection.updateOne(filter, updateReview, options);
             res.send(result)
         })
+
 
     } finally {
         // Ensures that the client will close when you finish/error
