@@ -124,6 +124,27 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/myreview', async (req,res)=>{
+            const email = req.query.email;
+            const filter = { email : email};
+            const result = await reviewCollection.find(filter).toArray();
+            res.send(result)
+        })
+
+        app.get('/review', async(req,res)=>{
+            const id = req.query.id;
+            const filter = { _id : new ObjectId(id)};
+            const result = await reviewCollection.findOne(filter)
+            res.send(result);
+        })
+
+        app.delete('/myreview/delete', async(req,res)=>{
+            const id = req.query.id;
+            const filter = { _id : new ObjectId(id)};
+            const result = await reviewCollection.deleteOne(filter);
+            res.send(result);
+        })
+
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
