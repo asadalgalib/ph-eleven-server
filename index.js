@@ -9,7 +9,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        'https://ass-eleven-auth.web.app',
+        'https://ass-eleven-auth.firebaseapp.com',
+        'http://localhost:5173'
+    ],
     credentials: true
 }));
 app.use(express.json());
@@ -60,14 +64,16 @@ async function run() {
 
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: false
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             }).send({ success: true })
         })
 
         app.post('/jwt/logout', (req, res) => {
             res.clearCookie('token', {
                 httpOnly: true,
-                secure: false
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             }).send({ message: 'cookie cleared' })
         })
 
