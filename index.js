@@ -145,6 +145,21 @@ async function run() {
             res.send(result);
         })
 
+        app.put('/myreview/update',async(req,res)=>{
+            const id = req.query.id;
+            const update = req.body;
+            const updateReview = {
+                $set:{
+                    rating : update.rating,
+                    review : update.review
+                }
+            } 
+            const filter = { _id : new ObjectId(id)}
+            const options = {upsert:true}
+            const result = await reviewCollection.updateOne(filter,updateReview,options);
+            res.send(result)
+        })
+
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
