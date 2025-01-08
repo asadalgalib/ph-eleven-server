@@ -6,12 +6,6 @@
 
 ###
 
-<div align="center">
-  <img height="200" src="https://github.com/asadalgalib/ph-eleven-client/blob/main/a11-two.png"  />
-</div>
-
-###
-
 <h2 align="left">Main Technology</h2>
 
 ###
