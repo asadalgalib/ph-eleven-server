@@ -33,21 +33,12 @@
 
 ###
 
-- axios : ^1.7.9
-- firebase : ^11.1.0
-- framer-motion : ^11.15.0
-- localforage : ^1.10.0
-- match-sorter : ^8.0.0
-- motion : ^11.15.0
-- react : ^18.3.1
-- react-dom : ^18.3.1
-- react-icons : ^5.4.0
-- react-router-dom : ^7.1.0
-- react-simple-star-rating : ^5.1.7
-- react-toastify : ^11.0.2
-- sort-by : ^1.2.0
-- sweetalert2 : ^11.15.3
-- swiper : ^11.1.15
+- cookie-parser : ^1.4.7
+- cors : ^2.8.5
+- dotenv : ^16.4.7
+- express : ^4.21.2
+- jsonwebtoken : ^9.0.2
+- mongodb : ^6.12.0
 
 ###
 
@@ -58,8 +49,8 @@
 <p align="left">To run this project locally  : </p> 
 
 - npm i for package install<br>
-- collect .env file or create a firebase project and use firebase key <br>
-- npm run dev
+- collect .env file or create a mongoDB database and use user name and pass word <br>
+- use a json web token secret
 
 ###
 
