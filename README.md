@@ -10,8 +10,9 @@
 
 ###
 
-- React Js
-- Tailwind CSS
+- Node Js
+- Express JS
+- MongoDB
 - Firebase
 
 ###
@@ -20,10 +21,11 @@
 
 ###
 
-- You can add services
-- You can add review of others services
-- You can manage your services
-- Reviews will be public, anyone can see theme.
+- You can create data
+- You can read data
+- You can update data
+- You can delete data
+- Data will secure with jwt
 
 ###
 
